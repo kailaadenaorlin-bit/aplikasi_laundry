@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXE LAUNDRY – Management System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-cream: #FAF7F2;
+            --bg-white: #FFFFFF;
+            --beige-accent: #E8DED1;
+            --sage-green: #6C7A68;
+            --sage-light: #8A9A86;
+            --sage-soft: #EBF0EA;
+            --sage-hover: #596656;
+            --text-dark: #2C352B;
+            --text-muted: #6B7280;
+            --border-color: #E2D9CD;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* Fullscreen Login Screen */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-cream);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        /* Sidebar Styling */
+        #sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background-color: var(--bg-white);
+            border-right: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1040;
+        }
+
+        #sidebar .brand {
+            padding: 1.5rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        #sidebar .brand-icon,
+        .login-card .brand-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--sage-green);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        #sidebar .nav-link {
+            color: var(--text-dark);
+            padding: 0.8rem 1.25rem;
+            margin: 0.2rem 0.8rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        #sidebar .nav-link:hover, #sidebar .nav-link.active {
+            background-color: var(--sage-soft);
+            color: var(--sage-green);
+        }
+
+        #sidebar .nav-link i {
+            font-size: 1.15rem;
+        }
+
+        /* Main Content */
+        #content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+            padding-bottom: 3rem;
+        }
+
+        /* Navbar Top */
+        .top-navbar {
+            background-color: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.8rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        /* Utility Cards */
+        .card-custom {
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-custom:hover {
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Custom Colors */
+        .bg-sage { background-color: var(--sage-green) !important; color: white !important; }
+        .bg-sage-light { background-color: var(--sage-soft) !important; color: var(--sage-green) !important; }
+        .btn-sage {
+            background-color: var(--sage-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-sage:hover {
+            background-color: var(--sage-hover);
+            color: white;
+        }
+
+        .btn-outline-sage {
+            border: 1.5px solid var(--sage-green);
+            color: var(--sage-green);
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .btn-outline-sage:hover {
+            background-color: var(--sage-green);
+            color: white;
+        }
+
+        /* Custom Table Styling */
+        .table-custom {
+            margin-bottom: 0;
+        }
+        .table-custom th {
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+            padding: 0.9rem 1rem;
+        }
+        .table-custom td {
+            padding: 0.9rem 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0eafe;
+        }
+
+        /* Badges */
+        .badge-status {
+            padding: 0.45em 0.85em;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.78rem;
+        }
+
+        /* Kanban Column */
+        .kanban-col {
+            background-color: var(--bg-cream);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1rem;
+            min-height: 500px;
+        }
+
+        .kanban-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+
+        /* Overlay Loader */
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Responsive Mobile Toggle */
+        @media (max-width: 991.98px) {
+            #sidebar {
+                margin-left: -260px;
+            }
+            #sidebar.show {
+                margin-left: 0;
+            }
+            #content {
+                margin-left: 0;
+            }
+        }
+
+        /* Print Style */
+        @media print {
+            #sidebar, .top-navbar, .no-print {
+                display: none !important;
+            }
+            #content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+            }
+            .card-custom {
+                border: 1px solid #ddd !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HALAMAN LOGIN -->
+    <div id="login-screen">
+        <div class="login-card">
+            <div class="text-center mb-4">
+                <div class="brand-icon mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.6rem;">
+                    <i class="bi bi-water"></i>
+                </div>
+                <h4 class="fw-bold mb-1" style="color: var(--sage-green);">LUXE LAUNDRY</h4>
+                <small class="text-muted fw-semibold">Sistem Manajemen Laundry</small>
+            </div>
+
+            <div id="login-error-alert" class="alert alert-danger py-2 small d-none" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> <span id="login-error-msg">Username atau Password salah!</span>
+            </div>
+
+            <form id="form-login" onsubmit="handleLogin(event)">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Username Admin</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                        <input type="text" class="form-control border-start-0 ps-0" id="login-username" placeholder="Masukkan Username" required autocomplete="off">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                        <input type="password" class="form-control border-start-0 ps-0" id="login-password" placeholder="Masukkan Password" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-sage w-100 py-2.5 fw-semibold fs-6">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Masuk Sistem
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="main-app" class="d-none">
+
+        <!-- Loading Indicator -->
+        <div id="loader-overlay" class="d-none">
+            <div class="spinner-border text-success mb-3" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h6 class="fw-semibold text-secondary" id="loader-text">Memproses data...</h6>
+        </div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="bi bi-water"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold mb-0 text-success-dark" style="color: var(--sage-green);">LUXE LAUNDRY</h5>
+                    <small class="text-muted fw-medium" style="font-size: 0.7rem;">MANAGEMENT SYSTEM</small>
+                </div>
+            </div>
+
+            <ul class="nav flex-column mt-3">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" onclick="switchMenu('dashboard', event)">
+                        <i class="bi bi-grid-1x2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="switchMenu('pelanggan', event)">
+                        <i class="bi bi-people"></i> Data Pelanggan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="switchMenu('layanan', event)">
+                        <i class="bi bi-tags"></i> Data Layanan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="switchMenu('transaksi', event)">
+                        <i class="bi bi-cart-plus"></i> Transaksi Laundry
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="switchMenu('pembayaran', event)">
+                        <i class="bi bi-credit-card"></i> Pembayaran
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="switchMenu('status', event)">
+                        <i class="bi bi-arrow-repeat"></i> Status Laundry
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="switchMenu('laporan', event)">
+                        <i class="bi bi-file-earmark-bar-graph"></i> Laporan
+                    </a>
+                </li>
+                <li class="nav-item mt-4 border-top pt-2">
+                    <a class="nav-link text-danger" href="#" onclick="handleLogout(event)">
+                        <i class="bi bi-box-arrow-left"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Content Area -->
+        <div id="content">
+            <!-- Top Navbar -->
+            <nav class="top-navbar d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-sm btn-outline-sage d-lg-none" id="sidebarToggle">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                    <h5 class="fw-bold mb-0" id="page-title">Dashboard Overview</h5>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <span id="api-status-badge" class="badge bg-secondary rounded-pill me-2 px-3 py-2">
+                        <i class="bi bi-database me-1"></i> Data Lokal
+                    </span>
+                    <button class="btn btn-outline-sage btn-sm" data-bs-toggle="modal" data-bs-target="#settingsModal">
+                        <i class="bi bi-gear me-1"></i> Koneksi GAS
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Main Body Content -->
+            <div class="container-fluid p-4">
+
+                <!-- Toast Container -->
+                <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+                    <div id="liveToast" class="toast align-items-center border-0 text-white" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body" id="toast-message">Notifikasi</div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 1: DASHBOARD -->
+                <section id="menu-dashboard" class="menu-section">
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-sm-6 col-xl-2.4 col-lg-4">
+                            <div class="card-custom p-3 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <small class="text-muted d-block fw-semibold">Pelanggan</small>
+                                    <h3 class="fw-bold mb-0 mt-1" id="stat-total-pelanggan">0</h3>
+                                </div>
+                                <div class="stat-icon bg-sage-light">
+                                    <i class="bi bi-people"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-2.4 col-lg-4">
+                            <div class="card-custom p-3 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <small class="text-muted d-block fw-semibold">Transaksi</small>
+                                    <h3 class="fw-bold mb-0 mt-1" id="stat-total-transaksi">0</h3>
+                                </div>
+                                <div class="stat-icon bg-sage-light">
+                                    <i class="bi bi-receipt"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-2.4 col-lg-4">
+                            <div class="card-custom p-3 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <small class="text-muted d-block fw-semibold">Diproses</small>
+                                    <h3 class="fw-bold mb-0 mt-1 text-warning" id="stat-diproses">0</h3>
+                                </div>
+                                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                                    <i class="bi bi-hourglass-split"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-2.4 col-lg-4">
+                            <div class="card-custom p-3 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <small class="text-muted d-block fw-semibold">Siap Diambil</small>
+                                    <h3 class="fw-bold mb-0 mt-1 text-info" id="stat-siap">0</h3>
+                                </div>
+                                <div class="stat-icon bg-info bg-opacity-10 text-info">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-2.4 col-lg-4">
+                            <div class="card-custom p-3 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <small class="text-muted d-block fw-semibold">Total Pendapatan</small>
+                                    <h4 class="fw-bold mb-0 mt-1 text-success" id="stat-pendapatan">Rp 0</h4>
+                                </div>
+                                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                                    <i class="bi bi-cash-stack"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-12 col-lg-7">
+                            <div class="card-custom p-4 h-100">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-graph-up-arrow me-2 text-success"></i>Grafik Pendapatan Transaksi</h6>
+                                <div style="position: relative; height:300px;">
+                                    <canvas id="revenueChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-5">
+                            <div class="card-custom p-4 h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-success"></i>Transaksi Terbaru</h6>
+                                    <button class="btn btn-link btn-sm text-decoration-none text-success" onclick="switchMenu('transaksi', event)">Lihat Semua</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-custom table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Pelanggan</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dash-recent-trx">
+                                            <!-- Dynamic JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 2: DATA PELANGGAN -->
+                <section id="menu-pelanggan" class="menu-section d-none">
+                    <div class="card-custom p-4">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                            <div>
+                                <h5 class="fw-bold mb-1">Daftar Pelanggan</h5>
+                                <small class="text-muted">Kelola data pelanggan Luxe Laundry</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <input type="text" class="form-control" id="search-pelanggan" placeholder="Cari nama/HP..." onkeyup="filterPelanggan()">
+                                <button class="btn btn-sage d-flex align-items-center gap-2" onclick="openModalPelanggan()">
+                                    <i class="bi bi-plus-lg"></i> Pelanggan
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-custom align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID Pelanggan</th>
+                                        <th>Nama Pelanggan</th>
+                                        <th>No. Handphone</th>
+                                        <th>Alamat</th>
+                                        <th class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-pelanggan-body">
+                                    <!-- Dynamic Content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 3: DATA LAYANAN -->
+                <section id="menu-layanan" class="menu-section d-none">
+                    <div class="card-custom p-4">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+                            <div>
+                                <h5 class="fw-bold mb-1">Daftar Layanan Laundry</h5>
+                                <small class="text-muted">Kelola jenis layanan dan tarif per kilogram</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <input type="text" class="form-control" id="search-layanan" placeholder="Cari layanan..." onkeyup="filterLayanan()">
+                                <button class="btn btn-sage d-flex align-items-center gap-2 text-nowrap" onclick="openModalLayanan()">
+                                    <i class="bi bi-plus-lg"></i> Layanan Baru
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-custom align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID Layanan</th>
+                                        <th>Nama Layanan</th>
+                                        <th>Harga / Kg</th>
+                                        <th class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-layanan-body">
+                                    <!-- Dynamic Content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 4: TRANSAKSI LAUNDRY -->
+                <section id="menu-transaksi" class="menu-section d-none">
+                    <div class="row g-4">
+                        <div class="col-12 col-lg-4">
+                            <div class="card-custom p-4">
+                                <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2 text-success"></i>Buat Transaksi Baru</h5>
+                                <form id="form-transaksi" onsubmit="handleSaveTransaksi(event)">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">No. Transaksi</label>
+                                        <input type="text" class="form-control bg-light" id="trx-id" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Pelanggan</label>
+                                        <select class="form-select" id="trx-pelanggan" required>
+                                            <!-- Dynamic Options -->
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Tanggal Masuk</label>
+                                        <input type="date" class="form-control" id="trx-tanggal" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-semibold">Jenis Layanan</label>
+                                        <select class="form-select" id="trx-layanan" onchange="calculateTotalTrx()" required>
+                                            <!-- Dynamic Options -->
+                                        </select>
+                                    </div>
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-6">
+                                            <label class="form-label small fw-semibold">Berat (Kg)</label>
+                                            <input type="number" step="0.1" min="0.1" class="form-control" id="trx-berat" value="1" oninput="calculateTotalTrx()" required>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small fw-semibold">Harga / Kg</label>
+                                            <input type="text" class="form-control bg-light" id="trx-harga-display" readonly value="Rp 0">
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-6">
+                                            <label class="form-label small fw-semibold">Metode Bayar</label>
+                                            <select class="form-select" id="trx-metode-bayar" required>
+                                                <option value="Tunai">Tunai</option>
+                                                <option value="QRIS">QRIS</option>
+                                                <option value="Transfer">Transfer</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small fw-semibold">Status Bayar</label>
+                                            <select class="form-select" id="trx-status-bayar" required>
+                                                <option value="Belum Lunas">Belum Lunas</option>
+                                                <option value="Lunas">Lunas</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 bg-light rounded-3 mb-3 border">
+                                        <small class="text-muted d-block fw-medium">Total Pembayaran:</small>
+                                        <h3 class="fw-bold text-success mb-0" id="trx-total-display">Rp 0</h3>
+                                    </div>
+                                    <button type="submit" class="btn btn-sage w-100 py-2">
+                                        <i class="bi bi-check-circle me-1"></i> Simpan Transaksi
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-lg-8">
+                            <div class="card-custom p-4">
+                                <h5 class="fw-bold mb-3">Riwayat Transaksi</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-custom align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>ID Transaksi</th>
+                                                <th>Pelanggan</th>
+                                                <th>Tanggal</th>
+                                                <th>Layanan</th>
+                                                <th>Berat</th>
+                                                <th>Total</th>
+                                                <th class="text-center">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-transaksi-body">
+                                            <!-- Dynamic Content -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 5: PEMBAYARAN -->
+                <section id="menu-pembayaran" class="menu-section d-none">
+                    <div class="card-custom p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h5 class="fw-bold mb-1">Status & Data Pembayaran</h5>
+                                <small class="text-muted">Kelola metode dan status pembayaran transaksi pelanggan</small>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-custom align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>ID Bayar</th>
+                                        <th>ID Transaksi</th>
+                                        <th>Pelanggan</th>
+                                        <th>Total Tagihan</th>
+                                        <th>Metode Pembayaran</th>
+                                        <th>Status Pembayaran</th>
+                                        <th class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-pembayaran-body">
+                                    <!-- Dynamic Content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 6: STATUS LAUNDRY (KANBAN BOARD) -->
+                <section id="menu-status" class="menu-section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="fw-bold mb-1">Pengerjaan Laundry</h5>
+                            <small class="text-muted">Pantau dan ubah status tahapan pengerjaan laundry pelanggan</small>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-xl-2.4">
+                            <div class="kanban-col">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0 text-secondary"><i class="bi bi-clock me-1"></i> Menunggu</h6>
+                                    <span class="badge bg-secondary rounded-pill" id="count-status-menunggu">0</span>
+                                </div>
+                                <div id="container-status-menunggu"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2.4">
+                            <div class="kanban-col">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-water me-1"></i> Sedang Dicuci</h6>
+                                    <span class="badge bg-primary rounded-pill" id="count-status-dicuci">0</span>
+                                </div>
+                                <div id="container-status-dicuci"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2.4">
+                            <div class="kanban-col">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0 text-warning"><i class="bi bi-fire me-1"></i> Sedang Disetrika</h6>
+                                    <span class="badge bg-warning text-dark rounded-pill" id="count-status-disetrika">0</span>
+                                </div>
+                                <div id="container-status-disetrika"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2.4">
+                            <div class="kanban-col">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0 text-info"><i class="bi bi-box-seam me-1"></i> Siap Diambil</h6>
+                                    <span class="badge bg-info rounded-pill" id="count-status-siap">0</span>
+                                </div>
+                                <div id="container-status-siap"></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 col-xl-2.4">
+                            <div class="kanban-col">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="fw-bold mb-0 text-success"><i class="bi bi-check-circle me-1"></i> Sudah Diambil</h6>
+                                    <span class="badge bg-success rounded-pill" id="count-status-diambil">0</span>
+                                </div>
+                                <div id="container-status-diambil"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION 7: LAPORAN -->
+                <section id="menu-laporan" class="menu-section d-none">
+                    <div class="card-custom p-4 mb-4 no-print">
+                        <h5 class="fw-bold mb-3">Filter Laporan Transaksi</h5>
+                        <div class="row g-3 align-items-end">
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-semibold">Tanggal Mulai</label>
+                                <input type="date" class="form-control" id="report-start-date">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <label class="form-label small fw-semibold">Tanggal Selesai</label>
+                                <input type="date" class="form-control" id="report-end-date">
+                            </div>
+                            <div class="col-12 col-md-4 d-flex gap-2">
+                                <button class="btn btn-sage w-50" onclick="applyReportFilter()">
+                                    <i class="bi bi-filter me-1"></i> Filter
+                                </button>
+                                <button class="btn btn-outline-sage w-50" onclick="window.print()">
+                                    <i class="bi bi-printer me-1"></i> Cetak
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-custom p-4">
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold text-success mb-1">LUXE LAUNDRY</h3>
+                            <p class="text-muted mb-0">Laporan Pendapatan dan Transaksi Laundry</p>
+                            <small class="text-secondary" id="report-period-text">Semua Periode</small>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <div class="p-3 bg-light rounded border text-center">
+                                    <small class="text-muted d-block">Total Pelanggan</small>
+                                    <h4 class="fw-bold mb-0" id="report-stat-pelanggan">0</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 bg-light rounded border text-center">
+                                    <small class="text-muted d-block">Total Transaksi</small>
+                                    <h4 class="fw-bold mb-0" id="report-stat-transaksi">0</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 bg-light rounded border text-center">
+                                    <small class="text-muted d-block">Transaksi Lunas</small>
+                                    <h4 class="fw-bold text-success mb-0" id="report-stat-lunas">0</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 bg-light rounded border text-center">
+                                    <small class="text-muted d-block">Total Omset Pendapatan</small>
+                                    <h4 class="fw-bold text-success mb-0" id="report-stat-pendapatan">Rp 0</h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold mb-3">Rincian Transaksi Filtered</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>ID Transaksi</th>
+                                        <th>Tanggal</th>
+                                        <th>Pelanggan</th>
+                                        <th>Layanan</th>
+                                        <th>Berat (Kg)</th>
+                                        <th>Total (Rp)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-table-body">
+                                    <!-- Dynamic JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: SETTINGS / GAS URL -->
+    <div class="modal fade" id="settingsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-gear me-2"></i> Pengaturan Web App API</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label small fw-semibold">Google Apps Script Web App URL</label>
+                    <input type="url" class="form-control mb-2" id="input-gas-url" placeholder="https://script.google.com/macros/s/.../exec">
+                    <small class="text-muted d-block mb-3">Masukkan Web App URL yang disebarkan dari Google Apps Script untuk sinkronisasi otomatis ke Google Spreadsheet.</small>
+                    <div class="alert alert-info py-2 small">
+                        <i class="bi bi-info-circle me-1"></i> Jika dikosongkan, sistem akan otomatis menggunakan database penyimpanan lokal (Local Storage browser).
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-sage" onclick="saveGASUrl()">Simpan Connections</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: PELANGGAN (CREATE/EDIT) -->
+    <div class="modal fade" id="modalPelanggan" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="modalPelangganTitle">Tambah Pelanggan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="form-pelanggan" onsubmit="handleSavePelanggan(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="pelanggan-edit-mode" value="0">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">ID Pelanggan</label>
+                            <input type="text" class="form-control bg-light" id="pelanggan-id" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Nama Pelanggan</label>
+                            <input type="text" class="form-control" id="pelanggan-nama" required placeholder="Masukkan nama lengkap">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Nomor HP / WhatsApp</label>
+                            <input type="tel" class="form-control" id="pelanggan-hp" required placeholder="08xxxxxxxxxx">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Alamat Lengkap</label>
+                            <textarea class="form-control" id="pelanggan-alamat" rows="3" placeholder="Alamat rumah / domisili"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-sage">Simpan Pelanggan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: LAYANAN (CREATE/EDIT) -->
+    <div class="modal fade" id="modalLayanan" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="modalLayananTitle">Tambah Layanan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="form-layanan" onsubmit="handleSaveLayanan(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="layanan-edit-mode" value="0">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">ID Layanan</label>
+                            <input type="text" class="form-control bg-light" id="layanan-id" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Nama Layanan</label>
+                            <input type="text" class="form-control" id="layanan-nama" required placeholder="Contoh: Cuci Setrika">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Harga per Kg (Rp)</label>
+                            <input type="number" class="form-control" id="layanan-harga" min="0" required placeholder="7000">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-sage">Simpan Layanan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: EDIT PEMBAYARAN -->
+    <div class="modal fade" id="modalPembayaran" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Update Pembayaran</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="form-pembayaran" onsubmit="handleSavePembayaran(event)">
+                    <div class="modal-body">
+                        <input type="hidden" id="pay-id">
+                        <input type="hidden" id="pay-trx-id">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">ID Transaksi</label>
+                            <input type="text" class="form-control bg-light" id="pay-trx-display" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Metode Pembayaran</label>
+                            <select class="form-select" id="pay-metode" required>
+                                <option value="Tunai">Tunai</option>
+                                <option value="Transfer">Transfer</option>
+                                <option value="QRIS">QRIS</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Status Pembayaran</label>
+                            <select class="form-select" id="pay-status" required>
+                                <option value="Belum Lunas">Belum Lunas</option>
+                                <option value="Lunas">Lunas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-sage">Perbarui Pembayaran</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- KONFIGURASI WEB APP GOOGLE APPS SCRIPT ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbyPh_7P3lkGHYO9RK5PTPJMUFY7cRgpmH_j-xwX_9nffpUTwbprSke_BDLjIe9RqWvWXQ/exec";
+
+        // --- ADMIN CREDENTIALS ---
+        const ADMIN_USER = "kaila adena orlin";
+        const ADMIN_PASS = "1214";
+
+        // --- NAMA SHEET ---
+        const SHEET = {
+            PELANGGAN: 'Pelanggan',
+            LAYANAN: 'Layanan',
+            TRANSAKSI: 'Transaksi',
+            PEMBAYARAN: 'Pembayaran'
+        };
+
+        let SCRIPT_URL = localStorage.getItem('LUXE_GAS_URL') || API_URL || '';
+
+        let appData = {
+            pelanggan: [
+                { ID_PELANGGAN: 'PLG-001', NAMA_PELANGGAN: 'Ahmad Rian', NO_HP: '081234567890', ALAMAT: 'Jl. Melati No. 12' },
+                { ID_PELANGGAN: 'PLG-002', NAMA_PELANGGAN: 'Siti Sarah', NO_HP: '089876543210', ALAMAT: 'Jl. Mawar No. 45' }
+            ],
+            layanan: [
+                { ID_LAYANAN: 'LYN-001', NAMA_LAYANAN: 'Cuci Kering', HARGA_KG: 5000 },
+                { ID_LAYANAN: 'LYN-002', NAMA_LAYANAN: 'Cuci Setrika', HARGA_KG: 8000 },
+                { ID_LAYANAN: 'LYN-003', NAMA_LAYANAN: 'Setrika Saja', HARGA_KG: 4000 },
+                { ID_LAYANAN: 'LYN-004', NAMA_LAYANAN: 'Cuci Express', HARGA_KG: 12000 }
+            ],
+            transaksi: [
+                { ID_TRANSAKSI: 'TRX-20231001-001', NAMA_PELANGGAN: 'Ahmad Rian', TANGGAL: '2023-10-01', LAYANAN: 'Cuci Setrika', BERAT: 3, TOTAL: 24000, STATUS_WORKFLOW: 'Siap Diambil' }
+            ],
+            pembayaran: [
+                { ID_PEMBAYARAN: 'BYR-001', ID_TRANSAKSI: 'TRX-20231001-001', METODE_PEMBAYARAN: 'QRIS', STATUS: 'Lunas' }
+            ]
+        };
+
+        let revenueChartInstance = null;
+
+        // --- AUTHENTICATION LOGIC ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const usernameInput = document.getElementById('login-username').value.trim();
+            const passwordInput = document.getElementById('login-password').value.trim();
+            const errorAlert = document.getElementById('login-error-alert');
+
+            if (usernameInput.toLowerCase() === ADMIN_USER.toLowerCase() && passwordInput === ADMIN_PASS) {
+                sessionStorage.setItem('LUXE_IS_LOGGED_IN', 'true');
+                errorAlert.classList.add('d-none');
+                document.getElementById('login-screen').classList.add('d-none');
+                document.getElementById('main-app').classList.remove('d-none');
+                initApp();
+            } else {
+                errorAlert.classList.remove('d-none');
+            }
+        }
+
+        function handleLogout(e) {
+            if(e) e.preventDefault();
+            sessionStorage.removeItem('LUXE_IS_LOGGED_IN');
+            document.getElementById('login-password').value = '';
+            document.getElementById('main-app').classList.add('d-none');
+            document.getElementById('login-screen').classList.remove('d-none');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = sessionStorage.getItem('LUXE_IS_LOGGED_IN') === 'true';
+            if (isLoggedIn) {
+                document.getElementById('login-screen').classList.add('d-none');
+                document.getElementById('main-app').classList.remove('d-none');
+                initApp();
+            } else {
+                document.getElementById('login-screen').classList.remove('d-none');
+                document.getElementById('main-app').classList.add('d-none');
+            }
+        });
+
+        function initApp() {
+            if (localStorage.getItem('LUXE_APP_DATA')) {
+                try {
+                    appData = JSON.parse(localStorage.getItem('LUXE_APP_DATA'));
+                } catch(e) {}
+            }
+            
+            if (SCRIPT_URL && SCRIPT_URL !== "URL_APPS_SCRIPT_SAYA") {
+                document.getElementById('input-gas-url').value = SCRIPT_URL;
+                document.getElementById('api-status-badge').className = "badge bg-success rounded-pill me-2 px-3 py-2";
+                document.getElementById('api-status-badge').innerHTML = `<i class="bi bi-cloud-check me-1"></i> Terhubung GAS`;
+                fetchDataFromGAS();
+            } else {
+                saveToLocalStorage();
+                renderAll();
+            }
+
+            const sidebarToggleBtn = document.getElementById('sidebarToggle');
+            if(sidebarToggleBtn) {
+                sidebarToggleBtn.addEventListener('click', () => {
+                    document.getElementById('sidebar').classList.toggle('show');
+                });
+            }
+
+            document.getElementById('trx-tanggal').value = new Date().toISOString().split('T')[0];
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('LUXE_APP_DATA', JSON.stringify(appData));
+        }
+
+        function saveGASUrl() {
+            const url = document.getElementById('input-gas-url').value.trim();
+            SCRIPT_URL = url;
+            localStorage.setItem('LUXE_GAS_URL', url);
+            const modal = bootstrap.Modal.getInstance(document.getElementById('settingsModal'));
+            modal.hide();
+
+            if(url) {
+                document.getElementById('api-status-badge').className = "badge bg-success rounded-pill me-2 px-3 py-2";
+                document.getElementById('api-status-badge').innerHTML = `<i class="bi bi-cloud-check me-1"></i> Terhubung GAS`;
+                showToast('URL Google Apps Script berhasil disimpan! Memuat data...', 'success');
+                fetchDataFromGAS();
+            } else {
+                document.getElementById('api-status-badge').className = "badge bg-secondary rounded-pill me-2 px-3 py-2";
+                document.getElementById('api-status-badge').innerHTML = `<i class="bi bi-database me-1"></i> Data Lokal`;
+                showToast('Menggunakan mode penyimpanan Lokal Browser.', 'info');
+                renderAll();
+            }
+        }
+
+        function formatDateISO(val) {
+            if(!val) return '';
+            if (typeof val === 'string' && val.includes('T')) {
+                return val.split('T')[0];
+            }
+            return String(val);
+        }
+
+        async function fetchDataFromGAS() {
+            if (!SCRIPT_URL || SCRIPT_URL === "URL_APPS_SCRIPT_SAYA") return;
+            showLoader(true, "Mengambil data dari Google Spreadsheet...");
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=readAll');
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data) {
+                    if (Array.isArray(result.data.pelanggan)) {
+                        appData.pelanggan = result.data.pelanggan;
+                    }
+                    if (Array.isArray(result.data.layanan)) {
+                        // Memastikan properti HARGA_KG terbaca dengan benar
+                        appData.layanan = result.data.layanan.map(l => ({
+                            ID_LAYANAN: l.ID_LAYANAN || l.id_layanan,
+                            NAMA_LAYANAN: l.NAMA_LAYANAN || l.nama_layanan,
+                            HARGA_KG: Number(l.HARGA_KG || l.harga_kg || l["HARGA/KG"] || 0)
+                        }));
+                    }
+                    if (Array.isArray(result.data.transaksi)) {
+                        appData.transaksi = result.data.transaksi.map(t => ({
+                            ...t,
+                            TANGGAL: formatDateISO(t.TANGGAL),
+                            STATUS_WORKFLOW: t.STATUS_WORKFLOW || 'Menunggu'
+                        }));
+                    }
+                    if (Array.isArray(result.data.pembayaran)) {
+                        appData.pembayaran = result.data.pembayaran;
+                    }
+                    
+                    saveToLocalStorage();
+                    renderAll();
+                    showToast("Data berhasil diperbarui dari Google Spreadsheet!", "success");
+                } else {
+                    showToast("Gagal membaca Spreadsheet: " + (result.message || 'Respons tidak valid'), "danger");
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                showToast("Gagal mengambil data dari Google Apps Script. Memakai cache lokal.", "danger");
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        async function postDataToGAS(action, sheetName, payload) {
+            if (!SCRIPT_URL || SCRIPT_URL === "URL_APPS_SCRIPT_SAYA") {
+                saveToLocalStorage();
+                renderAll();
+                return;
+            }
+
+            showLoader(true, "Menyimpan perubahan ke Google Spreadsheet...");
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: action,
+                        sheet: sheetName,
+                        data: payload
+                    })
+                });
+                const res = await response.json();
+                if(res.status === 'success') {
+                    showToast("Spreadsheet berhasil diperbarui!", "success");
+                } else {
+                    showToast("Gagal update Spreadsheet: " + res.message, "warning");
+                }
+            } catch (err) {
+                console.error("POST Error:", err);
+                showToast("Terjadi kesalahan koneksi ke Web App. Data disimpan di lokal.", "danger");
+            } finally {
+                saveToLocalStorage();
+                renderAll();
+                showLoader(false);
+            }
+        }
+
+        function renderAll() {
+            renderDashboard();
+            renderPelanggan();
+            renderLayanan();
+            renderTransaksiForm();
+            renderTransaksiTable();
+            renderPembayaran();
+            renderKanban();
+            renderLaporan();
+        }
+
+        function switchMenu(menuKey, event) {
+            if (event) event.preventDefault();
+            
+            document.querySelectorAll('#sidebar .nav-link').forEach(el => el.classList.remove('active'));
+            if(event && event.currentTarget) event.currentTarget.classList.add('active');
+
+            document.querySelectorAll('.menu-section').forEach(sec => sec.classList.add('d-none'));
+
+            const targetSection = document.getElementById(`menu-${menuKey}`);
+            if (targetSection) targetSection.classList.remove('d-none');
+
+            const titles = {
+                dashboard: 'Dashboard Overview',
+                pelanggan: 'Manajemen Data Pelanggan',
+                layanan: 'Daftar Layanan & Tarif',
+                transaksi: 'Transaksi Laundry Baru & Riwayat',
+                pembayaran: 'Status & Data Pembayaran',
+                status: 'Status Pengerjaan Laundry',
+                laporan: 'Laporan Keuangan & Transaksi'
+            };
+            document.getElementById('page-title').textContent = titles[menuKey] || 'Luxe Laundry';
+
+            document.getElementById('sidebar').classList.remove('show');
+
+            if (menuKey === 'dashboard') {
+                setTimeout(initRevenueChart, 100);
+            }
+        }
+
+        function formatRp(val) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(val || 0);
+        }
+
+        function renderDashboard() {
+            document.getElementById('stat-total-pelanggan').textContent = appData.pelanggan.length;
+            document.getElementById('stat-total-transaksi').textContent = appData.transaksi.length;
+
+            const diproses = appData.transaksi.filter(t => t.STATUS_WORKFLOW !== 'Sudah Diambil' && t.STATUS_WORKFLOW !== 'Siap Diambil').length;
+            const siap = appData.transaksi.filter(t => t.STATUS_WORKFLOW === 'Siap Diambil').length;
+            
+            document.getElementById('stat-diproses').textContent = diproses;
+            document.getElementById('stat-siap').textContent = siap;
+
+            const totalRevenue = appData.transaksi.reduce((sum, t) => sum + Number(t.TOTAL || 0), 0);
+            document.getElementById('stat-pendapatan').textContent = formatRp(totalRevenue);
+
+            const recentTrxBody = document.getElementById('dash-recent-trx');
+            recentTrxBody.innerHTML = '';
+            const sliceTrx = [...appData.transaksi].reverse().slice(0, 5);
+            
+            sliceTrx.forEach(t => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="fw-semibold">${t.ID_TRANSAKSI}</span></td>
+                    <td>${t.NAMA_PELANGGAN}</td>
+                    <td class="fw-bold text-success">${formatRp(t.TOTAL)}</td>
+                `;
+                recentTrxBody.appendChild(tr);
+            });
+
+            initRevenueChart();
+        }
+
+        function initRevenueChart() {
+            const ctx = document.getElementById('revenueChart');
+            if(!ctx) return;
+
+            if (revenueChartInstance) {
+                revenueChartInstance.destroy();
+            }
+
+            const dateMap = {};
+            appData.transaksi.forEach(t => {
+                const d = t.TANGGAL || 'Unspecified';
+                dateMap[d] = (dateMap[d] || 0) + Number(t.TOTAL || 0);
+            });
+
+            const labels = Object.keys(dateMap).slice(-7);
+            const dataVals = labels.map(l => dateMap[l]);
+
+            revenueChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.length ? labels : ['Hari ini'],
+                    datasets: [{
+                        label: 'Pendapatan (Rp)',
+                        data: dataVals.length ? dataVals : [0],
+                        borderColor: '#6C7A68',
+                        backgroundColor: 'rgba(108, 122, 104, 0.15)',
+                        fill: true,
+                        tension: 0.35,
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#6C7A68'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#E8DED1' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function renderPelanggan(filterText = '') {
+            const tbody = document.getElementById('table-pelanggan-body');
+            tbody.innerHTML = '';
+
+            const list = appData.pelanggan.filter(p => 
+                String(p.NAMA_PELANGGAN || '').toLowerCase().includes(filterText.toLowerCase()) || 
+                String(p.NO_HP || '').includes(filterText)
+            );
+
+            if(list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">Belum ada data pelanggan</td></tr>`;
+                return;
+            }
+
+            list.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge bg-light text-dark border">${p.ID_PELANGGAN}</span></td>
+                    <td class="fw-semibold">${p.NAMA_PELANGGAN}</td>
+                    <td>${p.NO_HP}</td>
+                    <td>${p.ALAMAT || '-'}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-sage me-1" onclick="editPelanggan('${p.ID_PELANGGAN}')"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deletePelanggan('${p.ID_PELANGGAN}')"><i class="bi bi-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterPelanggan() {
+            renderPelanggan(document.getElementById('search-pelanggan').value);
+        }
+
+        function openModalPelanggan() {
+            document.getElementById('modalPelangganTitle').textContent = "Tambah Pelanggan";
+            document.getElementById('pelanggan-edit-mode').value = "0";
+            document.getElementById('pelanggan-id').value = "PLG-" + String(appData.pelanggan.length + 1).padStart(3, '0');
+            document.getElementById('pelanggan-nama').value = '';
+            document.getElementById('pelanggan-hp').value = '';
+            document.getElementById('pelanggan-alamat').value = '';
+            
+            new bootstrap.Modal(document.getElementById('modalPelanggan')).show();
+        }
+
+        function editPelanggan(id) {
+            const p = appData.pelanggan.find(item => item.ID_PELANGGAN === id);
+            if(!p) return;
+
+            document.getElementById('modalPelangganTitle').textContent = "Edit Pelanggan";
+            document.getElementById('pelanggan-edit-mode').value = "1";
+            document.getElementById('pelanggan-id').value = p.ID_PELANGGAN;
+            document.getElementById('pelanggan-nama').value = p.NAMA_PELANGGAN;
+            document.getElementById('pelanggan-hp').value = p.NO_HP;
+            document.getElementById('pelanggan-alamat').value = p.ALAMAT;
+
+            new bootstrap.Modal(document.getElementById('modalPelanggan')).show();
+        }
+
+        async function handleSavePelanggan(e) {
+            e.preventDefault();
+            const id = document.getElementById('pelanggan-id').value;
+            const nama = document.getElementById('pelanggan-nama').value.trim();
+            const hp = document.getElementById('pelanggan-hp').value.trim();
+            const alamat = document.getElementById('pelanggan-alamat').value.trim();
+            const isEdit = document.getElementById('pelanggan-edit-mode').value === "1";
+
+            const payload = { ID_PELANGGAN: id, NAMA_PELANGGAN: nama, NO_HP: hp, ALAMAT: alamat };
+
+            bootstrap.Modal.getInstance(document.getElementById('modalPelanggan')).hide();
+
+            if(isEdit) {
+                const index = appData.pelanggan.findIndex(p => p.ID_PELANGGAN === id);
+                if(index !== -1) appData.pelanggan[index] = payload;
+                await postDataToGAS('update', SHEET.PELANGGAN, payload);
+            } else {
+                appData.pelanggan.push(payload);
+                await postDataToGAS('create', SHEET.PELANGGAN, payload);
+            }
+        }
+
+        async function deletePelanggan(id) {
+            if(!confirm(`Yakin ingin menghapus pelanggan ${id}?`)) return;
+            appData.pelanggan = appData.pelanggan.filter(p => p.ID_PELANGGAN !== id);
+            await postDataToGAS('delete', SHEET.PELANGGAN, { ID_PELANGGAN: id });
+            showToast("Pelanggan berhasil dihapus.", "danger");
+        }
+
+        // --- RENDER LAYANAN (Disesuaikan HARGA_KG) ---
+        function renderLayanan(filterText = '') {
+            const tbody = document.getElementById('table-layanan-body');
+            tbody.innerHTML = '';
+
+            const list = appData.layanan.filter(l => String(l.NAMA_LAYANAN || '').toLowerCase().includes(filterText.toLowerCase()));
+
+            if(list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">Belum ada data layanan</td></tr>`;
+                return;
+            }
+
+            list.forEach(l => {
+                const hargaVal = Number(l.HARGA_KG || l.harga_kg || 0);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge bg-light text-dark border">${l.ID_LAYANAN}</span></td>
+                    <td class="fw-semibold">${l.NAMA_LAYANAN}</td>
+                    <td class="fw-bold text-success">${formatRp(hargaVal)}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-sage me-1" onclick="editLayanan('${l.ID_LAYANAN}')"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteLayanan('${l.ID_LAYANAN}')"><i class="bi bi-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterLayanan() {
+            renderLayanan(document.getElementById('search-layanan').value);
+        }
+
+        function openModalLayanan() {
+            document.getElementById('modalLayananTitle').textContent = "Tambah Layanan Baru";
+            document.getElementById('layanan-edit-mode').value = "0";
+            document.getElementById('layanan-id').value = "LYN-" + String(appData.layanan.length + 1).padStart(3, '0');
+            document.getElementById('layanan-nama').value = '';
+            document.getElementById('layanan-harga').value = '';
+            
+            new bootstrap.Modal(document.getElementById('modalLayanan')).show();
+        }
+
+        function editLayanan(id) {
+            const l = appData.layanan.find(item => item.ID_LAYANAN === id);
+            if(!l) return;
+
+            document.getElementById('modalLayananTitle').textContent = "Edit Layanan";
+            document.getElementById('layanan-edit-mode').value = "1";
+            document.getElementById('layanan-id').value = l.ID_LAYANAN;
+            document.getElementById('layanan-nama').value = l.NAMA_LAYANAN;
+            document.getElementById('layanan-harga').value = l.HARGA_KG || l.harga_kg || 0;
+
+            new bootstrap.Modal(document.getElementById('modalLayanan')).show();
+        }
+
+        async function handleSaveLayanan(e) {
+            e.preventDefault();
+            const id = document.getElementById('layanan-id').value;
+            const nama = document.getElementById('layanan-nama').value.trim();
+            const harga = Number(document.getElementById('layanan-harga').value);
+            const isEdit = document.getElementById('layanan-edit-mode').value === "1";
+
+            const payload = { ID_LAYANAN: id, NAMA_LAYANAN: nama, HARGA_KG: harga };
+
+            bootstrap.Modal.getInstance(document.getElementById('modalLayanan')).hide();
+
+            if(isEdit) {
+                const idx = appData.layanan.findIndex(l => l.ID_LAYANAN === id);
+                if(idx !== -1) appData.layanan[idx] = payload;
+                await postDataToGAS('update', SHEET.LAYANAN, payload);
+            } else {
+                appData.layanan.push(payload);
+                await postDataToGAS('create', SHEET.LAYANAN, payload);
+            }
+        }
+
+        async function deleteLayanan(id) {
+            if(!confirm(`Hapus layanan ${id}?`)) return;
+            appData.layanan = appData.layanan.filter(l => l.ID_LAYANAN !== id);
+            await postDataToGAS('delete', SHEET.LAYANAN, { ID_LAYANAN: id });
+            showToast("Layanan dihapus.", "danger");
+        }
+
+        function renderTransaksiForm() {
+            const now = new Date();
+            const ymd = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
+            const trxId = `TRX-${ymd}-${String(appData.transaksi.length + 1).padStart(3, '0')}`;
+            document.getElementById('trx-id').value = trxId;
+
+            const selectPelanggan = document.getElementById('trx-pelanggan');
+            const prevPelanggan = selectPelanggan.value;
+            selectPelanggan.innerHTML = '<option value="">-- Pilih Pelanggan --</option>';
+            appData.pelanggan.forEach(p => {
+                selectPelanggan.innerHTML += `<option value="${p.NAMA_PELANGGAN}">${p.NAMA_PELANGGAN} (${p.NO_HP})</option>`;
+            });
+            selectPelanggan.value = prevPelanggan;
+
+            const selectLayanan = document.getElementById('trx-layanan');
+            const prevLayanan = selectLayanan.value;
+            selectLayanan.innerHTML = '<option value="">-- Pilih Layanan --</option>';
+            appData.layanan.forEach(l => {
+                const hargaLayanan = Number(l.HARGA_KG || l.harga_kg || 0);
+                selectLayanan.innerHTML += `<option value="${l.NAMA_LAYANAN}" data-harga="${hargaLayanan}">${l.NAMA_LAYANAN} - ${formatRp(hargaLayanan)}/kg</option>`;
+            });
+            selectLayanan.value = prevLayanan;
+
+            calculateTotalTrx();
+        }
+
+        function calculateTotalTrx() {
+            const selectLayanan = document.getElementById('trx-layanan');
+            const selectedOpt = selectLayanan.options[selectLayanan.selectedIndex];
+            const harga = selectedOpt ? Number(selectedOpt.getAttribute('data-harga') || 0) : 0;
+            const berat = Number(document.getElementById('trx-berat').value || 0);
+
+            const total = berat * harga;
+
+            document.getElementById('trx-harga-display').value = formatRp(harga);
+            document.getElementById('trx-total-display').textContent = formatRp(total);
+        }
+
+        async function handleSaveTransaksi(e) {
+            e.preventDefault();
+            const id = document.getElementById('trx-id').value;
+            const pelanggan = document.getElementById('trx-pelanggan').value;
+            const tanggal = document.getElementById('trx-tanggal').value;
+            const layanan = document.getElementById('trx-layanan').value;
+            const berat = Number(document.getElementById('trx-berat').value);
+            const metodeBayar = document.getElementById('trx-metode-bayar').value;
+            const statusBayar = document.getElementById('trx-status-bayar').value;
+
+            if(!pelanggan || !layanan) {
+                showToast("Pilih pelanggan dan layanan terlebih dahulu!", "warning");
+                return;
+            }
+
+            const optLayanan = document.getElementById('trx-layanan').options[document.getElementById('trx-layanan').selectedIndex];
+            const harga = Number(optLayanan.getAttribute('data-harga') || 0);
+            const total = berat * harga;
+
+            const payloadTrx = {
+                ID_TRANSAKSI: id,
+                NAMA_PELANGGAN: pelanggan,
+                TANGGAL: tanggal,
+                LAYANAN: layanan,
+                BERAT: berat,
+                TOTAL: total,
+                STATUS_WORKFLOW: 'Menunggu'
+            };
+
+            const payloadPay = {
+                ID_PEMBAYARAN: 'BYR-' + String(appData.pembayaran.length + 1).padStart(3, '0'),
+                ID_TRANSAKSI: id,
+                METODE_PEMBAYARAN: metodeBayar,
+                STATUS: statusBayar
+            };
+
+            appData.transaksi.push(payloadTrx);
+            appData.pembayaran.push(payloadPay);
+
+            document.getElementById('form-transaksi').reset();
+            document.getElementById('trx-tanggal').value = new Date().toISOString().split('T')[0];
+
+            await postDataToGAS('create', SHEET.TRANSAKSI, payloadTrx);
+            await postDataToGAS('create', SHEET.PEMBAYARAN, payloadPay);
+
+            showToast("Transaksi baru berhasil disimpan!", "success");
+        }
+
+        function renderTransaksiTable() {
+            const tbody = document.getElementById('table-transaksi-body');
+            tbody.innerHTML = '';
+
+            if(appData.transaksi.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">Belum ada riwayat transaksi</td></tr>`;
+                return;
+            }
+
+            [...appData.transaksi].reverse().forEach(t => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge bg-light text-dark border">${t.ID_TRANSAKSI}</span></td>
+                    <td class="fw-semibold">${t.NAMA_PELANGGAN}</td>
+                    <td>${t.TANGGAL}</td>
+                    <td>${t.LAYANAN}</td>
+                    <td>${t.BERAT} kg</td>
+                    <td class="fw-bold text-success">${formatRp(t.TOTAL)}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTransaksi('${t.ID_TRANSAKSI}')"><i class="bi bi-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function deleteTransaksi(id) {
+            if(!confirm(`Hapus transaksi ${id}?`)) return;
+            appData.transaksi = appData.transaksi.filter(t => t.ID_TRANSAKSI !== id);
+            appData.pembayaran = appData.pembayaran.filter(p => p.ID_TRANSAKSI !== id);
+
+            await postDataToGAS('delete', SHEET.TRANSAKSI, { ID_TRANSAKSI: id });
+            await postDataToGAS('delete', SHEET.PEMBAYARAN, { ID_TRANSAKSI: id });
+
+            showToast("Transaksi telah dihapus.", "danger");
+        }
+
+        function renderPembayaran() {
+            const tbody = document.getElementById('table-pembayaran-body');
+            tbody.innerHTML = '';
+
+            if(appData.pembayaran.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">Belum ada data pembayaran</td></tr>`;
+                return;
+            }
+
+            appData.pembayaran.forEach(p => {
+                const trx = appData.transaksi.find(t => t.ID_TRANSAKSI === p.ID_TRANSAKSI) || {};
+                const isLunas = p.STATUS === 'Lunas';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge bg-light text-dark border">${p.ID_PEMBAYARAN}</span></td>
+                    <td><span class="fw-semibold">${p.ID_TRANSAKSI}</span></td>
+                    <td>${trx.NAMA_PELANGGAN || '-'}</td>
+                    <td class="fw-bold">${formatRp(trx.TOTAL)}</td>
+                    <td><span class="badge bg-light text-dark border"><i class="bi bi-wallet2 me-1"></i>${p.METODE_PEMBAYARAN || 'Tunai'}</span></td>
+                    <td>
+                        <span class="badge-status ${isLunas ? 'bg-success bg-opacity-10 text-success' : 'bg-danger bg-opacity-10 text-danger'}">
+                            <i class="bi ${isLunas ? 'bi-check-circle' : 'bi-x-circle'} me-1"></i>${p.STATUS}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-sage" onclick="openModalPembayaran('${p.ID_PEMBAYARAN}')"><i class="bi bi-pencil-square"></i> Ubah</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openModalPembayaran(payId) {
+            const p = appData.pembayaran.find(item => item.ID_PEMBAYARAN === payId);
+            if(!p) return;
+
+            document.getElementById('pay-id').value = p.ID_PEMBAYARAN;
+            document.getElementById('pay-trx-id').value = p.ID_TRANSAKSI;
+            document.getElementById('pay-trx-display').value = p.ID_TRANSAKSI;
+            document.getElementById('pay-metode').value = p.METODE_PEMBAYARAN || 'Tunai';
+            document.getElementById('pay-status').value = p.STATUS || 'Belum Lunas';
+
+            new bootstrap.Modal(document.getElementById('modalPembayaran')).show();
+        }
+
+        async function handleSavePembayaran(e) {
+            e.preventDefault();
+            const payId = document.getElementById('pay-id').value;
+            const trxId = document.getElementById('pay-trx-id').value;
+            const metode = document.getElementById('pay-metode').value;
+            const status = document.getElementById('pay-status').value;
+
+            const idx = appData.pembayaran.findIndex(p => p.ID_PEMBAYARAN === payId);
+            const payload = {
+                ID_PEMBAYARAN: payId,
+                ID_TRANSAKSI: trxId,
+                METODE_PEMBAYARAN: metode,
+                STATUS: status
+            };
+
+            if(idx !== -1) {
+                appData.pembayaran[idx] = payload;
+            } else {
+                appData.pembayaran.push(payload);
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('modalPembayaran')).hide();
+            await postDataToGAS('update', SHEET.PEMBAYARAN, payload);
+            showToast("Status pembayaran diperbarui!", "success");
+        }
+
+        function renderKanban() {
+            const stages = ['Menunggu', 'Sedang Dicuci', 'Sedang Disetrika', 'Siap Diambil', 'Sudah Diambil'];
+            const containers = {
+                'Menunggu': document.getElementById('container-status-menunggu'),
+                'Sedang Dicuci': document.getElementById('container-status-dicuci'),
+                'Sedang Disetrika': document.getElementById('container-status-disetrika'),
+                'Siap Diambil': document.getElementById('container-status-siap'),
+                'Sudah Diambil': document.getElementById('container-status-diambil')
+            };
+
+            const counts = { 'Menunggu': 0, 'Sedang Dicuci': 0, 'Sedang Disetrika': 0, 'Siap Diambil': 0, 'Sudah Diambil': 0 };
+
+            stages.forEach(st => containers[st].innerHTML = '');
+
+            appData.transaksi.forEach(t => {
+                const currentStage = t.STATUS_WORKFLOW || 'Menunggu';
+                if(counts[currentStage] !== undefined) counts[currentStage]++;
+
+                const card = document.createElement('div');
+                card.className = 'kanban-card';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <small class="fw-bold text-secondary">${t.ID_TRANSAKSI}</small>
+                        <small class="text-muted">${t.TANGGAL}</small>
+                    </div>
+                    <h6 class="fw-bold mb-1">${t.NAMA_PELANGGAN}</h6>
+                    <small class="d-block text-muted mb-2"><i class="bi bi-tag me-1"></i>${t.LAYANAN} (${t.BERAT} kg)</small>
+                    <div class="mt-3">
+                        <label class="form-label micro text-muted mb-1" style="font-size:0.75rem;">Ubah Status:</label>
+                        <select class="form-select form-select-sm" onchange="updateWorkflowStatus('${t.ID_TRANSAKSI}', this.value)">
+                            ${stages.map(s => `<option value="${s}" ${s === currentStage ? 'selected' : ''}>${s}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+
+                if(containers[currentStage]) {
+                    containers[currentStage].appendChild(card);
+                }
+            });
+
+            document.getElementById('count-status-menunggu').textContent = counts['Menunggu'];
+            document.getElementById('count-status-dicuci').textContent = counts['Sedang Dicuci'];
+            document.getElementById('count-status-disetrika').textContent = counts['Sedang Disetrika'];
+            document.getElementById('count-status-siap').textContent = counts['Siap Diambil'];
+            document.getElementById('count-status-diambil').textContent = counts['Sudah Diambil'];
+        }
+
+        async function updateWorkflowStatus(trxId, newStatus) {
+            const trx = appData.transaksi.find(t => t.ID_TRANSAKSI === trxId);
+            if(trx) {
+                trx.STATUS_WORKFLOW = newStatus;
+                await postDataToGAS('update', SHEET.TRANSAKSI, trx);
+                showToast(`Status ${trxId} diubah menjadi "${newStatus}"`, 'info');
+            }
+        }
+
+        function renderLaporan(filteredList = null) {
+            const list = filteredList || appData.transaksi;
+            
+            document.getElementById('report-stat-pelanggan').textContent = appData.pelanggan.length;
+            document.getElementById('report-stat-transaksi').textContent = list.length;
+
+            const lunasCount = list.filter(t => {
+                const p = appData.pembayaran.find(pay => pay.ID_TRANSAKSI === t.ID_TRANSAKSI);
+                return p && p.STATUS === 'Lunas';
+            }).length;
+            document.getElementById('report-stat-lunas').textContent = lunasCount;
+
+            const omset = list.reduce((sum, t) => sum + Number(t.TOTAL || 0), 0);
+            document.getElementById('report-stat-pendapatan').textContent = formatRp(omset);
+
+            const tbody = document.getElementById('report-table-body');
+            tbody.innerHTML = '';
+
+            if(list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">Tidak ada data transaksi pada rentang tanggal ini</td></tr>`;
+                return;
+            }
+
+            list.forEach((t, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td>${t.ID_TRANSAKSI}</td>
+                    <td>${t.TANGGAL}</td>
+                    <td>${t.NAMA_PELANGGAN}</td>
+                    <td>${t.LAYANAN}</td>
+                    <td>${t.BERAT} kg</td>
+                    <td class="fw-bold">${formatRp(t.TOTAL)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function applyReportFilter() {
+            const start = document.getElementById('report-start-date').value;
+            const end = document.getElementById('report-end-date').value;
+
+            if(!start || !end) {
+                showToast("Silakan pilih tanggal mulai dan selesai!", "warning");
+                return;
+            }
+
+            const filtered = appData.transaksi.filter(t => t.TANGGAL >= start && t.TANGGAL <= end);
+            document.getElementById('report-period-text').textContent = `Periode: ${start} s.d. ${end}`;
+            renderLaporan(filtered);
+            showToast(`Menampilkan ${filtered.length} transaksi terfilter.`, "info");
+        }
+
+        function showToast(message, type = 'success') {
+            const toastEl = document.getElementById('liveToast');
+            const toastBody = document.getElementById('toast-message');
+            
+            toastEl.className = `toast align-items-center border-0 text-white bg-${type}`;
+            toastBody.textContent = message;
+
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        function showLoader(show, text = 'Memproses data...') {
+            const loader = document.getElementById('loader-overlay');
+            document.getElementById('loader-text').textContent = text;
+            if(show) {
+                loader.classList.remove('d-none');
+            } else {
+                loader.classList.add('d-none');
+            }
+        }
+    </script>
+</body>
+</html>
